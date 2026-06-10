@@ -127,9 +127,9 @@ Geminiが求人票のテキストを解析し、会社名・職種・給与・�
 | カテゴリ | 技術 |
 |---|---|
 | フロントエンド | React / Vite |
-| AI解析 | Gemini 2.5 Flash API（テキスト・画像入力） |
-| 地図表示 | Google Maps 埋め込みURL（APIキー不要） |
+| AI解析 | Gemini 2.5 Flash API（テキスト・画像から情報を読み込み・仕訳） |
 | バックエンド | Vercel Serverless Functions |
+| データベース | Neon（PostgreSQL） |
 | デプロイ | Vercel |
 
 ---
@@ -141,11 +141,12 @@ npm install
 npm run dev
 ```
 
-AI抽出を使う場合は `.env.local` に以下を設定してください。
+`.env.local` に以下を設定してください。
 
 ```
-VITE_GEMINI_API_KEY=your_api_key
-VITE_GEMINI_MODEL=Gemini 2.5 Flash
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-2.5-flash
+DATABASE_URL=your_neon_database_url
 ```
 
 `.env.local` はgit管理外です。GitHubにはAPIキーを含めないでください。
@@ -155,3 +156,5 @@ VITE_GEMINI_MODEL=Gemini 2.5 Flash
 ```bash
 npm run build
 ```
+
+Vercelにデプロイする場合は自動でビルドされるため、手動実行は不要です。
