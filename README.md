@@ -1,4 +1,4 @@
-# Job-hunting Management System Sample　就活管理システム
+# 就活管理システム
 **求人票を貼るだけ。面接管理からオンライン接続まで、就活のすべてが1サイトで完結するAI搭載管理システム**
 React + Vite で構築した就活管理システムのサンプルプロジェクトです。
 
@@ -43,8 +43,6 @@ Job-hunting Management System Sample/
 ├── vite.config.js             # Vite設定
 └── README.md
 ```
-
-
 
 
 ## 課題と解決策
