@@ -134,27 +134,3 @@ Geminiが求人票のテキストを解析し、会社名・職種・給与・�
 
 ---
 
-## セットアップ
-
-```bash
-npm install
-npm run dev
-```
-
-`.env.local` に以下を設定してください。
-
-```
-GEMINI_API_KEY=your_gemini_api_key
-GEMINI_MODEL=gemini-2.5-flash
-DATABASE_URL=your_neon_database_url
-```
-
-`.env.local` はgit管理外です。GitHubにはAPIキーを含めないでください。
-
-## ビルド
-
-```bash
-npm run build
-```
-
-Vercelにデプロイする場合は自動でビルドされるため、手動実行は不要です。
