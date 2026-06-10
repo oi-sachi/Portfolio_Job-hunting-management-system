@@ -1,9 +1,22 @@
-import { createClient } from "@supabase/supabase-js";
+// Neon DB — APIルート経由でDB操作
 
-export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+const call = async (action, body = {}) => {
+  const res = await fetch(`/api/db?action=${action}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "DB error");
+  return data;
+};
+
+const callGet = async (action) => {
+  const res = await fetch(`/api/db?action=${action}`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "DB error");
+  return data;
+};
 
 const toRow = (job) => ({
   id: job.id,
@@ -54,31 +67,21 @@ const fromRow = (row) => ({
 });
 
 export const dbLoadJobs = async () => {
-  const { data, error } = await supabase
-    .from("jobs")
-    .select("*")
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return (data || []).map(fromRow);
+  const rows = await callGet("load-jobs");
+  return (rows || []).map(fromRow);
 };
 
 export const dbSaveJob = async (job) => {
   const row = toRow(job);
-  const { data, error } = await supabase
-    .from("jobs")
-    .upsert(row, { onConflict: "id" })
-    .select()
-    .single();
-  if (error) throw error;
-  return fromRow(data);
+  const saved = await call("save-job", row);
+  return fromRow(saved);
 };
 
 export const dbDeleteJob = async (id) => {
-  const { error } = await supabase.from("jobs").delete().eq("id", id);
-  if (error) throw error;
+  await call("delete-job", { id });
 };
 
-// ai_judgments テーブル用
+// ai_judgments
 const toAiRow = (job) => ({
   id: job.id,
   company_name: job.company_name || null,
@@ -144,29 +147,18 @@ const fromAiRow = (row) => ({
 });
 
 export const dbLoadAiJudgments = async () => {
-  const { data, error } = await supabase
-    .from("ai_judgments")
-    .select("*")
-    .order("judged_at", { ascending: false });
-  if (error) throw error;
-  return (data || []).map(fromAiRow);
+  const rows = await callGet("load-ai-judgments");
+  return (rows || []).map(fromAiRow);
 };
 
 export const dbSaveAiJudgment = async (job) => {
-  const { error } = await supabase
-    .from("ai_judgments")
-    .upsert(toAiRow(job), { onConflict: "id" });
-  if (error) throw error;
+  await call("save-ai-judgment", toAiRow(job));
 };
 
 export const dbDeleteAiJudgment = async (id) => {
-  const { error } = await supabase.from("ai_judgments").delete().eq("id", id);
-  if (error) throw error;
+  await call("delete-ai-judgment", { id });
 };
 
 export const dbDeleteAllJobs = async () => {
-  // ai_judgments は linked_job_id の ON DELETE CASCADE で自動削除される
-  // ただし linked_job_id が null のものは別途削除
-  await supabase.from("ai_judgments").delete().is("linked_job_id", null);
-  await supabase.from("jobs").delete().neq("id", "___never___");
+  await call("delete-all", {});
 };
